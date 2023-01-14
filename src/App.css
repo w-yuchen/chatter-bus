@@ -40,3 +40,7 @@
 
 /* Color Palette */
 /* https://colorhunt.co/palette/4721834b56d282c3ecf1f6f5 */
+.mapboxgl-canvas {
+  position: inherit !important;
+  /* height: 50% !important; */
+}

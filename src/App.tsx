@@ -1,5 +1,6 @@
-import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "mapbox-gl/dist/mapbox-gl.css";
+import "./App.css";
 
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
@@ -111,14 +112,28 @@ function App() {
   const mapContainer: any = useRef(null);
   const map: any = useRef(null);
 
-  useEffect(() => getLocation(), []);
+  // useEffect(() => getLocation(), []);
   useEffect(() => {
+    getLocation();
     if (map.current) return; // initialize map only once
     mapboxgl.accessToken = 'pk.eyJ1IjoiY2hlbmNlMDgiLCJhIjoiY2xjdmpwYm9hMGo3eDNwczVkZXJ5ZnF2YyJ9.uRHqwo8pni_HX61dgJQkXw';
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v11'
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: [70.9, 42.3], // starting center in [lng, lat]
+      zoom: 1 // starting zoom
     });
+    map.current.addControl(
+      new mapboxgl.GeolocateControl({
+      positionOptions: {
+      enableHighAccuracy: true
+      },
+      // When active the map will receive updates to the device's location as it changes.
+      trackUserLocation: true,
+      // Draw an arrow next to the location dot to indicate which direction the device is heading.
+      showUserHeading: true
+      })
+    );
   }, [])
 
   return (
@@ -132,9 +147,7 @@ function App() {
               "My location",
               <div>
                 <div>{locationSet ? nearestBusStop : "Location not found"}</div>
-                <div ref={mapContainer} id="map">
-                  YOOOOOOOO
-                </div>
+                <div ref={mapContainer} id="map"/>
               </div>
             )}
             <br></br>
