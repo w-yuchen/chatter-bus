@@ -12,7 +12,8 @@ import Row from "react-bootstrap/Row";
 import React from "react";
 import { useState, useEffect, useRef } from "react";
 
-import mapboxgl from "mapbox-gl";
+import mapboxgl, { LngLat, MercatorCoordinate } from "mapbox-gl";
+import { Button } from "react-bootstrap";
 
 // var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
 
@@ -68,10 +69,16 @@ async function getNearestBusStop(lat: number, long: number) {
   return response.text();
 }
 
+function ble() {
+  const device = navigator.bluetooth.requestDevice({acceptAllDevices: true}).then(res => console.log(res));
+}
+
 function App() {
   // useEffect(() => {
   //   location();
   // });
+
+
 
   const [locationSet, setLocationSet] = useState(false);
   const [firstLat, setFirstLat] = useState(0);
@@ -120,8 +127,8 @@ function App() {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v12',
-      center: [70.9, 42.3], // starting center in [lng, lat]
-      zoom: 1 // starting zoom
+      center: [-13, 1], // starting center in [lng, lat]
+      zoom: 1.5 // starting zoom
     });
     map.current.addControl(
       new mapboxgl.GeolocateControl({
@@ -143,6 +150,9 @@ function App() {
       <Container fluid className="p-4">
         <Row>
           <Col xs={6}>
+            <Button onClick={ble}>
+
+            </Button>
             {section(
               "My location",
               <div>
