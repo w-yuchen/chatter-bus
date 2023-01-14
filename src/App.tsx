@@ -149,7 +149,7 @@ function App() {
 
       <Container fluid className="p-4">
         <Row>
-          <Col xs={6}>
+          <Col sm={6}>
             <Button onClick={ble}>
 
             </Button>
@@ -179,7 +179,7 @@ function App() {
               </div>
             )}
           </Col>
-          <Col>{section("My Bus Buddies", <div>{buddyDisplay}</div>)}</Col>
+          <Col sm={6}>{section("My Bus Buddies", <div>{buddyDisplay}</div>)}</Col>
         </Row>
       </Container>
     </div>
