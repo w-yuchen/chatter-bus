@@ -8,8 +8,16 @@ import InputGroup from "react-bootstrap/InputGroup";
 import ListGroup from "react-bootstrap/ListGroup";
 import Row from "react-bootstrap/Row";
 
-import React from 'react';
+import React from "react";
 import { useState, useEffect } from "react";
+
+var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
+
+mapboxgl.accessToken = 'pk.eyJ1IjoiY2hlbmNlMDgiLCJhIjoiY2xjdmpwYm9hMGo3eDNwczVkZXJ5ZnF2YyJ9.uRHqwo8pni_HX61dgJQkXw';
+var map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/streets-v11'
+});
 
 const header = (
   <header className="App-header">
@@ -30,14 +38,19 @@ const section = (title: string, children: any) => (
 const buddies = [
   { username: "chence08", status: "yo @josuaaah i am doing some math" },
   { username: "wangyuchen", status: "trying to figure out RestAPI" },
-  { username: "some-old-guy", status: "Where am I? What bus is this? This bus go Jurong Point one right" },
+  {
+    username: "some-old-guy",
+    status: "Where am I? What bus is this? This bus go Jurong Point one right",
+  },
 ];
 
 const buddyDisplay = (
   <ListGroup variant="flush">
     {buddies.map(({ username, status }) => (
       <ListGroup.Item>
-        <div><b>{username}</b></div>
+        <div>
+          <b>{username}</b>
+        </div>
         <div className="font-italic">{status}</div>
       </ListGroup.Item>
     ))}
@@ -46,13 +59,13 @@ const buddyDisplay = (
 
 async function getNearestBusStop(lat: number, long: number) {
   const response = await fetch(
-    'https://ys7aqvqbuflsqez4a2iuhhlfdy0ahmls.lambda-url.ap-northeast-1.on.aws/', 
+    "https://ys7aqvqbuflsqez4a2iuhhlfdy0ahmls.lambda-url.ap-northeast-1.on.aws/",
     {
-      method: 'POST', 
+      method: "POST",
       body: JSON.stringify({
-        "latitude": lat,
-        "longitude": long
-      })
+        latitude: lat,
+        longitude: long,
+      }),
     }
   );
   return response.text();
@@ -71,26 +84,33 @@ function App() {
 
   const [speed, setSpeed] = useState(0);
   // const [firstAlt, setFirstAlt] = useState(0);
-  const successLoc = (setLat: any, setLong: any, setTime: any) => (pos: GeolocationPosition) => {
-    console.log(pos);
-    // setFirstAlt(pos.coords.altitude);
-    setLat(pos.coords.latitude);
-    setLong(pos.coords.longitude);
-    setTime(pos.timestamp);
-    setSpeed(pos.coords.speed ? pos.coords.speed : speed);
-    getNearestBusStop(pos.coords.latitude, pos.coords.latitude).then((data) => setNearest(data));
-    setLocationSet(true);
-  }
+  const successLoc =
+    (setLat: any, setLong: any, setTime: any) => (pos: GeolocationPosition) => {
+      console.log(pos);
+      // setFirstAlt(pos.coords.altitude);
+      setLat(pos.coords.latitude);
+      setLong(pos.coords.longitude);
+      setTime(pos.timestamp);
+      setSpeed(pos.coords.speed ? pos.coords.speed : speed);
+      getNearestBusStop(pos.coords.latitude, pos.coords.latitude).then((data) =>
+        setNearest(data)
+      );
+      setLocationSet(true);
+    };
   const failureLoc = (err: GeolocationPositionError) => {
     setLocationSet(false);
     console.log(err);
-  }
+  };
 
   const getLocation = () => {
     // e.preventDefault();
-    navigator.geolocation.getCurrentPosition(successLoc(setFirstLat, setFirstLong, setFirstTime), failureLoc, {
-      enableHighAccuracy: true,
-    });
+    navigator.geolocation.getCurrentPosition(
+      successLoc(setFirstLat, setFirstLong, setFirstTime),
+      failureLoc,
+      {
+        enableHighAccuracy: true,
+      }
+    );
   };
 
   useEffect(() => getLocation(), []);
@@ -105,10 +125,10 @@ function App() {
             {section(
               "My location",
               <div>
-                {locationSet 
-                  ? nearestBusStop
-                  : "Location not found"
-                }
+                <div>{locationSet ? nearestBusStop : "Location not found"}</div>
+                <div id="map">
+                  YOOOOOOOO
+                </div>
               </div>
             )}
             <br></br>
