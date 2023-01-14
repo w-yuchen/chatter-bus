@@ -8,7 +8,8 @@ import InputGroup from "react-bootstrap/InputGroup";
 import ListGroup from "react-bootstrap/ListGroup";
 import Row from "react-bootstrap/Row";
 
-// import React from 'react';
+import React from 'react';
+import { useState, useEffect } from "react";
 
 const header = (
   <header className="App-header">
@@ -43,6 +44,20 @@ const buddyDisplay = (
   </ListGroup>
 );
 
+async function getNearestBusStop(lat: number, long: number) {
+  const response = await fetch(
+    'https://ys7aqvqbuflsqez4a2iuhhlfdy0ahmls.lambda-url.ap-northeast-1.on.aws/', 
+    {
+      method: 'POST', 
+      body: JSON.stringify({
+        "latitude": lat,
+        "longitude": long
+      })
+    }
+  );
+  return response.text();
+}
+
 function App() {
   // useEffect(() => {
   //   location();
@@ -52,28 +67,33 @@ function App() {
   const [firstLat, setFirstLat] = useState(0);
   const [firstLong, setFirstLong] = useState(0);
   const [firstTime, setFirstTime] = useState(0);
+  const [nearestBusStop, setNearest] = useState("");
+
   const [speed, setSpeed] = useState(0);
   // const [firstAlt, setFirstAlt] = useState(0);
   const successLoc = (setLat: any, setLong: any, setTime: any) => (pos: GeolocationPosition) => {
     console.log(pos);
-    setLocationSet(true);
     // setFirstAlt(pos.coords.altitude);
     setLat(pos.coords.latitude);
     setLong(pos.coords.longitude);
     setTime(pos.timestamp);
     setSpeed(pos.coords.speed ? pos.coords.speed : speed);
+    getNearestBusStop(pos.coords.latitude, pos.coords.latitude).then((data) => setNearest(data));
+    setLocationSet(true);
   }
   const failureLoc = (err: GeolocationPositionError) => {
     setLocationSet(false);
     console.log(err);
   }
 
-  const getLocation = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
+  const getLocation = () => {
+    // e.preventDefault();
     navigator.geolocation.getCurrentPosition(successLoc(setFirstLat, setFirstLong, setFirstTime), failureLoc, {
       enableHighAccuracy: true,
     });
   };
+
+  useEffect(() => getLocation(), []);
 
   return (
     <div className="App">
@@ -85,8 +105,10 @@ function App() {
             {section(
               "My location",
               <div>
-                You are on bus <b>187</b>, heading towards <b>Pulau Tekong</b>{" "}
-                because you are a chao recruit.
+                {locationSet 
+                  ? nearestBusStop
+                  : "Location not found"
+                }
               </div>
             )}
             <br></br>
