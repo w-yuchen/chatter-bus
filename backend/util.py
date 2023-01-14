@@ -8,7 +8,7 @@ def getClosestBusStop(latlon = (1.30637, 103.77337)):
     bs = [
         (
             distance.distance((x['Latitude'], x['Longitude']), latlon).m,
-            int(x['BusStopCode'])
+            x['BusStopCode']
         )
         for x in data
     ]
