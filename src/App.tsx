@@ -9,15 +9,11 @@ import ListGroup from "react-bootstrap/ListGroup";
 import Row from "react-bootstrap/Row";
 
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
-var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
+import mapboxgl from "mapbox-gl";
 
-mapboxgl.accessToken = 'pk.eyJ1IjoiY2hlbmNlMDgiLCJhIjoiY2xjdmpwYm9hMGo3eDNwczVkZXJ5ZnF2YyJ9.uRHqwo8pni_HX61dgJQkXw';
-var map = new mapboxgl.Map({
-  container: 'map',
-  style: 'mapbox://styles/mapbox/streets-v11'
-});
+// var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
 
 const header = (
   <header className="App-header">
@@ -112,8 +108,18 @@ function App() {
       }
     );
   };
+  const mapContainer: any = useRef(null);
+  const map: any = useRef(null);
 
   useEffect(() => getLocation(), []);
+  useEffect(() => {
+    if (map.current) return; // initialize map only once
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY2hlbmNlMDgiLCJhIjoiY2xjdmpwYm9hMGo3eDNwczVkZXJ5ZnF2YyJ9.uRHqwo8pni_HX61dgJQkXw';
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/streets-v11'
+    });
+  }, [])
 
   return (
     <div className="App">
@@ -126,7 +132,7 @@ function App() {
               "My location",
               <div>
                 <div>{locationSet ? nearestBusStop : "Location not found"}</div>
-                <div id="map">
+                <div ref={mapContainer} id="map">
                   YOOOOOOOO
                 </div>
               </div>
