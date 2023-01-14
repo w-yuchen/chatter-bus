@@ -1,4 +1,12 @@
 .App {
+
+}
+
+.section-title {
+  color: #4B56D2;
+  text-align: left;
+  font-size: 1.5rem;
+  font-weight: 700;
   text-align: center;
 }
 
@@ -7,32 +15,28 @@
   pointer-events: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  background-color: #472183;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 .App-link {
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.App-title {
+  color: #F1F6F5;
+  font-weight: bolder;
+  font-size: 2rem;
+
 }
+
+.App-subtitle {
+  color: #F1F6F5;
+  font-weight: lighter;
+  font-size: 1rem;
+}
+
+/* Color Palette */
+/* https://colorhunt.co/palette/4721834b56d282c3ecf1f6f5 */
