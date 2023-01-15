@@ -1,6 +1,7 @@
 {
   "name": "chatter-bus",
   "version": "0.1.0",
+  "homepage": "{Amplify-URL}/#/",
   "private": true,
   "dependencies": {
     "@chatscope/chat-ui-kit-react": "^1.9.8",
