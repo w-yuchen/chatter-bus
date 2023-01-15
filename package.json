@@ -25,7 +25,8 @@
     "socket.io-client": "^4.5.4",
     "typescript": "^4.9.4",
     "web-vitals": "^2.1.4",
-    "webbluetooth": "^2.2.0"
+    "webbluetooth": "^2.2.0",
+    "yarn.lock": "^0.0.1-security"
   },
   "scripts": {
     "start": "react-scripts start",
