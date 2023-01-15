@@ -84,13 +84,13 @@ function makeMessage(msg: string) {
   );
 }
 
-async function sendMessage(newMsg:string) {
-  fetch(
+async function sendMessage(newMsg:string, chatId:string) {
+  return fetch(
     "https://3pe4d2f25bkevpayocs7gdhovi0jivti.lambda-url.ap-northeast-1.on.aws/", {
       method: "POST",
       body: JSON.stringify({
-        chatId: "151", 
-        name: "Jenny", 
+        chatId: chatId, 
+        name: "", 
         header: "", 
         content: newMsg, 
         timestamp: Date.now()
@@ -99,15 +99,15 @@ async function sendMessage(newMsg:string) {
   )
 }
 
-async function getMessagesForBus(bus: string) {
+async function getMessagesForBus(bus: string, chatId:string) {
   const response = await fetch(
     "https://k632xlmt42ftzu7poqwqrimlkm0pqpbs.lambda-url.ap-northeast-1.on.aws/", {
     method: "POST",
     body: JSON.stringify({
-      chatId: "151"
+      chatId: chatId
     })
   });
-  return response.text();
+  return response.json();
 }
 
 function App() {
@@ -118,7 +118,7 @@ function App() {
   // ===================================================
   const [socketUrl, setSocketUrl] = useState("wss://nxbcjwnvqc.execute-api.ap-northeast-1.amazonaws.com/Prod");
   const [messageHistory, setMessageHistory] = useState([]);
-  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
+  // const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
   // ===================================================
 
   const [locationSet, setLocationSet] = useState(false);
@@ -131,6 +131,13 @@ function App() {
   const [hasBus, sethasBus] = useState("");
   const [busBtns, setBusBtns] = useState<ReactElement[]>([]);
   const [chatId, setChatId] = useState<string>("");
+
+  interface IMessage {
+    content: string;
+    timestamp: number;
+  }
+  
+  const [messages, setMessages] = useState<IMessage[]>([]);
 
   const [speed, setSpeed] = useState(0);
   // const [firstAlt, setFirstAlt] = useState(0);
@@ -199,10 +206,7 @@ function App() {
       })
     );
 
-    if (lastMessage !== null) {
-      setMessageHistory((prev:any) => prev.concat(lastMessage));
-    }
-  }, [lastMessage, setMessageHistory])
+  }, [])
 
   const getChatIdClick = (busNum:string) => (e:React.MouseEvent) => {
     e.preventDefault();
@@ -214,7 +218,12 @@ function App() {
         busNumber: busNum,
       }),
     }).then(res => res.json())
-    .then(data => setChatId(data.chatId));
+    .then(data => {
+      setChatId(data.chatId);
+      return data.chatId;
+    })
+    .then(chat => getMessagesForBus(busNum, chat))
+    .then(data => console.log(data));
     // fetch()
   }
 
@@ -274,6 +283,8 @@ function App() {
             <div style={{
               height: "500px"
             }}>
+              {
+                chatId !== "" ?
                           <ChatContainer>
                             <ConversationHeader>
                               <ConversationHeader.Content>
@@ -287,7 +298,6 @@ function App() {
                               <MessageSeparator>
                               Saturday, 30 November 2019
                               </MessageSeparator>
-          
                       <Message model={{
                     message: "Hello my friend",
                     sentTime: "15 mins ago",
@@ -295,7 +305,6 @@ function App() {
                     direction: "incoming",
                     position: "single"
                   }}>
-                        <Avatar src={"/Users/chen/github/chatter-bus/src/_temp_avatar.jpg"} name={"Joe"} />
                       </Message>
                       
                       <Message model={{
@@ -314,8 +323,19 @@ function App() {
                     position: "first"
                   }} avatarSpacer />
                 </MessageList>
-                <MessageInput placeholder="Type message here" />
+                <MessageInput placeholder="Type message here" onSend={(msg:string) => {
+                  sendMessage(msg, chatId)
+                  .then(res => res.json())
+                  .then((data:any[]) => 
+                  {
+                    const msgs = data.map( x => { return {'content': x.content, 'timestamp': x.timestamp}} );
+                    setMessages(msgs);
+                    console.log(msgs);
+                    return true;
+                  })
+                }}/>
               </ChatContainer>
+              : <div></div> }
             </div>
           {/* <div>
             <button onClick={handleClickChangeSocketUrl}>
