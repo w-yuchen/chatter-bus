@@ -1,5 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "mapbox-gl/dist/mapbox-gl.css";
+import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
+
 import "./App.css";
 
 import Col from "react-bootstrap/Col";
@@ -10,10 +12,14 @@ import ListGroup from "react-bootstrap/ListGroup";
 import Row from "react-bootstrap/Row";
 
 import React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 import mapboxgl, { LngLat, MercatorCoordinate } from "mapbox-gl";
 import { Button } from "react-bootstrap";
+
+import useWebSocket, { ReadyState } from "react-use-websocket";
+
+import { MainContainer, ChatContainer, MessageList, Message, MessageInput, ConversationHeader, Avatar, MessageSeparator} from '@chatscope/chat-ui-kit-react';
 
 // var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
 
@@ -33,28 +39,6 @@ const section = (title: string, children: any) => (
   </div>
 );
 
-const buddies = [
-  { username: "chence08", status: "yo @josuaaah i am doing some math" },
-  { username: "wangyuchen", status: "trying to figure out RestAPI" },
-  {
-    username: "some-old-guy",
-    status: "Where am I? What bus is this? This bus go Jurong Point one right",
-  },
-];
-
-const buddyDisplay = (
-  <ListGroup variant="flush">
-    {buddies.map(({ username, status }) => (
-      <ListGroup.Item>
-        <div>
-          <b>{username}</b>
-        </div>
-        <div className="font-italic">{status}</div>
-      </ListGroup.Item>
-    ))}
-  </ListGroup>
-);
-
 async function getNearestBusStop(lat: number, long: number) {
   const response = await fetch(
     "https://ys7aqvqbuflsqez4a2iuhhlfdy0ahmls.lambda-url.ap-northeast-1.on.aws/",
@@ -63,6 +47,20 @@ async function getNearestBusStop(lat: number, long: number) {
       body: JSON.stringify({
         latitude: lat,
         longitude: long,
+      }),
+    }
+  );
+  return response.text();
+}
+
+async function getIncomingBus(bsCode: string) {
+  const response = await fetch(
+    "https://d6zocx3vlxmnjvvaycl5n63txy0vnqns.lambda-url.ap-northeast-1.on.aws/",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        BusStopCode: bsCode,
+        timestamp: Date.now()
       }),
     }
   );
@@ -78,13 +76,18 @@ function App() {
   //   location();
   // });
 
-
+  // ===================================================
+  const [socketUrl, setSocketUrl] = useState("wss://nxbcjwnvqc.execute-api.ap-northeast-1.amazonaws.com/Prod");
+  const [messageHistory, setMessageHistory] = useState([]);
+  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
+  // ===================================================
 
   const [locationSet, setLocationSet] = useState(false);
   const [firstLat, setFirstLat] = useState(0);
   const [firstLong, setFirstLong] = useState(0);
   const [firstTime, setFirstTime] = useState(0);
   const [nearestBusStop, setNearest] = useState("");
+  const [incomingBus, setIncoming] = useState([]);
 
   const [speed, setSpeed] = useState(0);
   // const [firstAlt, setFirstAlt] = useState(0);
@@ -97,8 +100,14 @@ function App() {
       setTime(pos.timestamp);
       setSpeed(pos.coords.speed ? pos.coords.speed : speed);
       getNearestBusStop(pos.coords.latitude, pos.coords.latitude).then((data) =>
-        setNearest(data)
-      );
+        {
+          setNearest(data); 
+          return data;
+        }
+      ).then(bsCode => getIncomingBus(bsCode))
+      .then((res: any) => {
+        setIncoming(res);
+      });
       setLocationSet(true);
     };
   const failureLoc = (err: GeolocationPositionError) => {
@@ -141,7 +150,26 @@ function App() {
       showUserHeading: true
       })
     );
-  }, [])
+
+    if (lastMessage !== null) {
+      setMessageHistory((prev:any) => prev.concat(lastMessage));
+    }
+  }, [lastMessage, setMessageHistory])
+
+  const handleClickChangeSocketUrl = useCallback(
+    () => setSocketUrl('wss://nxbcjwnvqc.execute-api.ap-northeast-1.amazonaws.com/Prod'),
+    []
+  );
+
+  const handleClickSendMessage = useCallback(() => sendMessage('{"action":"sendmessage", "data":"hello world"}'), []);
+
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: 'Connecting',
+    [ReadyState.OPEN]: 'Open',
+    [ReadyState.CLOSING]: 'Closing',
+    [ReadyState.CLOSED]: 'Closed',
+    [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+  }[readyState];
 
   return (
     <div className="App">
@@ -179,7 +207,72 @@ function App() {
               </div>
             )}
           </Col>
-          <Col sm={6}>{section("My Bus Buddies", <div>{buddyDisplay}</div>)}</Col>
+          <Col sm={6}>
+            <div style={{
+              height: "500px"
+            }}>
+                          <ChatContainer>
+                            <ConversationHeader>
+                              <ConversationHeader.Content>
+                                          <span style={{
+                                  color: "#ec1212",
+                                  alignSelf: "flex-center"
+                                }}>Bus 188</span>
+                                        </ConversationHeader.Content>
+                            </ConversationHeader>
+                            <MessageList>
+                              <MessageSeparator>
+                              Saturday, 30 November 2019
+                              </MessageSeparator>
+          
+                      <Message model={{
+                    message: "Hello my friend",
+                    sentTime: "15 mins ago",
+                    sender: "Joe",
+                    direction: "incoming",
+                    position: "single"
+                  }}>
+                        <Avatar src={"/Users/chen/github/chatter-bus/src/_temp_avatar.jpg"} name={"Joe"} />
+                      </Message>
+                      
+                      <Message model={{
+                    message: "Hello my friend",
+                    sentTime: "15 mins ago",
+                    sender: "localSender",
+                    direction: "outgoing",
+                    position: "single"
+                  }} />
+                      
+                      <Message model={{
+                    message: "Hello my friend",
+                    sentTime: "15 mins ago",
+                    sender: "Joe",
+                    direction: "incoming",
+                    position: "first"
+                  }} avatarSpacer />
+                </MessageList>
+                <MessageInput placeholder="Type message here" />
+              </ChatContainer>
+            </div>
+          <div>
+            <button onClick={handleClickChangeSocketUrl}>
+              Click Me to change Socket Url
+            </button>
+            <button
+              onClick={handleClickSendMessage}
+              disabled={readyState !== ReadyState.OPEN}
+            >
+              Click Me to send 'Hello'
+            </button>
+            <span>The WebSocket is currently {connectionStatus}</span>
+            {lastMessage ? <span>Last message: {lastMessage.data}</span> : null}
+            <ul>
+              {messageHistory.map((message, idx) => (
+                <span key={idx}>{message ? message : null}</span>
+              ))}
+            </ul>
+          </div>
+          </Col>
         </Row>
       </Container>
     </div>
