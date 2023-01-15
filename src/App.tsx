@@ -59,7 +59,7 @@ async function getIncomingBus(bsCode: string) {
     {
       method: "POST",
       body: JSON.stringify({
-        BusStopCode: bsCode,
+        busStopCode: bsCode,
         timestamp: Date.now()
       }),
     }
@@ -86,7 +86,8 @@ function App() {
   const [firstLat, setFirstLat] = useState(0);
   const [firstLong, setFirstLong] = useState(0);
   const [firstTime, setFirstTime] = useState(0);
-  const [nearestBusStop, setNearest] = useState({"description":"", "busStopCode": ""});
+  const [nearestBusStop, setNearest] = useState("");
+  const [nearestDes, setNearestDes] = useState("");
   const [incomingBus, setIncoming] = useState([]);
 
   const [speed, setSpeed] = useState(0);
@@ -99,14 +100,17 @@ function App() {
       setLong(pos.coords.longitude);
       setTime(pos.timestamp);
       setSpeed(pos.coords.speed ? pos.coords.speed : speed);
-      getNearestBusStop(pos.coords.latitude, pos.coords.latitude).then((data:any) =>
-        {
-          console.log(data);
-          setNearest({"description": data.description, "busStopCode": data.busStopCode}); 
-          console.log(data);
-          return data.busStopCode;
-        }
-      ).then(bsCode => getIncomingBus(bsCode))
+      getNearestBusStop(pos.coords.latitude, pos.coords.latitude)
+      .then((data:string) =>
+      {
+        const d = JSON.parse(data);
+        setNearest(d.busStopCode); 
+        console.log(nearestBusStop);
+        console.log(data);
+        setNearestDes(d.description); 
+        return d.busStopCode;
+      })
+      .then(bsCode => getIncomingBus(bsCode))
       .then((res: any) => {
         setIncoming(res);
       });
@@ -187,7 +191,7 @@ function App() {
               "My location",
               <div>
                 <div>{locationSet 
-                ? nearestBusStop['busStopCode'] + "\n" + nearestBusStop['description']
+                ? nearestBusStop + "\n" + nearestDes
                 : "Location not found"}</div>
                 <div ref={mapContainer} id="map"/>
               </div>
