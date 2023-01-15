@@ -109,11 +109,11 @@ function App() {
         console.log(data);
         setNearestDes(d.description); 
         return d.busStopCode;
-      })
-      .then(bsCode => getIncomingBus(bsCode))
-      .then((res: any) => {
-        setIncoming(res);
       });
+      // .then(bsCode => getIncomingBus(bsCode))
+      // .then((res: any) => {
+      //   setIncoming(res);
+      // });
       setLocationSet(true);
     };
   const failureLoc = (err: GeolocationPositionError) => {
@@ -162,20 +162,20 @@ function App() {
     }
   }, [lastMessage, setMessageHistory])
 
-  const handleClickChangeSocketUrl = useCallback(
-    () => setSocketUrl('wss://nxbcjwnvqc.execute-api.ap-northeast-1.amazonaws.com/Prod'),
-    []
-  );
+  // const handleClickChangeSocketUrl = useCallback(
+  //   () => setSocketUrl('wss://nxbcjwnvqc.execute-api.ap-northeast-1.amazonaws.com/Prod'),
+  //   []
+  // );
 
-  const handleClickSendMessage = useCallback(() => sendMessage('{"action":"sendmessage", "data":"hello world"}'), []);
+  // const handleClickSendMessage = useCallback(() => sendMessage('{"action":"sendmessage", "data":"hello world"}'), []);
 
-  const connectionStatus = {
-    [ReadyState.CONNECTING]: 'Connecting',
-    [ReadyState.OPEN]: 'Open',
-    [ReadyState.CLOSING]: 'Closing',
-    [ReadyState.CLOSED]: 'Closed',
-    [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
-  }[readyState];
+  // const connectionStatus = {
+  //   [ReadyState.CONNECTING]: 'Connecting',
+  //   [ReadyState.OPEN]: 'Open',
+  //   [ReadyState.CLOSING]: 'Closing',
+  //   [ReadyState.CLOSED]: 'Closed',
+  //   [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+  // }[readyState];
 
   return (
     <div className="App">
@@ -262,7 +262,7 @@ function App() {
                 <MessageInput placeholder="Type message here" />
               </ChatContainer>
             </div>
-          <div>
+          {/* <div>
             <button onClick={handleClickChangeSocketUrl}>
               Click Me to change Socket Url
             </button>
@@ -279,7 +279,7 @@ function App() {
                 <span key={idx}>{message ? message : null}</span>
               ))}
             </ul>
-          </div>
+          </div> */}
           </Col>
         </Row>
       </Container>
