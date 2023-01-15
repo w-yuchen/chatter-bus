@@ -86,7 +86,7 @@ function App() {
   const [firstLat, setFirstLat] = useState(0);
   const [firstLong, setFirstLong] = useState(0);
   const [firstTime, setFirstTime] = useState(0);
-  const [nearestBusStop, setNearest] = useState("");
+  const [nearestBusStop, setNearest] = useState({"description":"", "busStopCode": ""});
   const [incomingBus, setIncoming] = useState([]);
 
   const [speed, setSpeed] = useState(0);
@@ -99,10 +99,12 @@ function App() {
       setLong(pos.coords.longitude);
       setTime(pos.timestamp);
       setSpeed(pos.coords.speed ? pos.coords.speed : speed);
-      getNearestBusStop(pos.coords.latitude, pos.coords.latitude).then((data) =>
+      getNearestBusStop(pos.coords.latitude, pos.coords.latitude).then((data:any) =>
         {
-          setNearest(data); 
-          return data;
+          console.log(data);
+          setNearest({"description": data.description, "busStopCode": data.busStopCode}); 
+          console.log(data);
+          return data.busStopCode;
         }
       ).then(bsCode => getIncomingBus(bsCode))
       .then((res: any) => {
@@ -184,13 +186,15 @@ function App() {
             {section(
               "My location",
               <div>
-                <div>{locationSet ? nearestBusStop : "Location not found"}</div>
+                <div>{locationSet 
+                ? nearestBusStop['busStopCode'] + "\n" + nearestBusStop['description']
+                : "Location not found"}</div>
                 <div ref={mapContainer} id="map"/>
               </div>
             )}
             <br></br>
             {section(
-              "My display",
+              "Are you boarding?",
               <div>
                 <InputGroup size="lg" className="mb-3">
                   <InputGroup.Text id="basic-addon1">@</InputGroup.Text>
