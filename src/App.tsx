@@ -72,6 +72,44 @@ function ble() {
   const device = navigator.bluetooth.requestDevice({acceptAllDevices: true}).then(res => console.log(res));
 }
 
+function makeMessage(msg: string) {
+  return (
+    <Message model={{
+      message: msg,
+      sentTime: "15 mins ago",
+      sender: "Joe",
+      direction: "incoming",
+      position: "single"
+    }} />
+  );
+}
+
+async function sendMessage(newMsg:string) {
+  fetch(
+    "https://3pe4d2f25bkevpayocs7gdhovi0jivti.lambda-url.ap-northeast-1.on.aws/", {
+      method: "POST",
+      body: JSON.stringify({
+        chatId: "151", 
+        name: "Jenny", 
+        header: "", 
+        content: newMsg, 
+        timestamp: Date.now()
+      })
+    }
+  )
+}
+
+async function getMessagesForBus(bus: string) {
+  const response = await fetch(
+    "https://k632xlmt42ftzu7poqwqrimlkm0pqpbs.lambda-url.ap-northeast-1.on.aws/", {
+    method: "POST",
+    body: JSON.stringify({
+      chatId: "151"
+    })
+  });
+  return response.text();
+}
+
 function App() {
   // useEffect(() => {
   //   location();
