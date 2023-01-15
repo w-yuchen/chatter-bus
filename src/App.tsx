@@ -21,6 +21,10 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, ConversationHeader, Avatar, MessageSeparator} from '@chatscope/chat-ui-kit-react';
 import { JsxElement } from "typescript";
+interface IMessage {
+  content: string;
+  timestamp: number;
+}
 
 // var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
 
@@ -72,10 +76,10 @@ async function getIncomingBus(bsCode: string) {
 //   const device = navigator.bluetooth.getDevices().then(res => console.log(res));
 // }
 
-function makeMessage(msg: string) {
+function makeMessage(msg: IMessage) {
   return (
     <Message model={{
-      message: msg,
+      message: msg.content,
       sentTime: "15 mins ago",
       sender: "Joe",
       direction: "incoming",
@@ -132,10 +136,6 @@ function App() {
   const [busBtns, setBusBtns] = useState<ReactElement[]>([]);
   const [chatId, setChatId] = useState<string>("");
 
-  interface IMessage {
-    content: string;
-    timestamp: number;
-  }
   
   const [messages, setMessages] = useState<IMessage[]>([]);
 
@@ -294,35 +294,13 @@ function App() {
                                 }}>Bus 188</span>
                                         </ConversationHeader.Content>
                             </ConversationHeader>
-                            <MessageList>
-                              <MessageSeparator>
-                              Saturday, 30 November 2019
-                              </MessageSeparator>
-                      <Message model={{
-                    message: "Hello my friend",
-                    sentTime: "15 mins ago",
-                    sender: "Joe",
-                    direction: "incoming",
-                    position: "single"
-                  }}>
-                      </Message>
-                      
-                      <Message model={{
-                    message: "Hello my friend",
-                    sentTime: "15 mins ago",
-                    sender: "localSender",
-                    direction: "outgoing",
-                    position: "single"
-                  }} />
-                      
-                      <Message model={{
-                    message: "Hello my friend",
-                    sentTime: "15 mins ago",
-                    sender: "Joe",
-                    direction: "incoming",
-                    position: "first"
-                  }} avatarSpacer />
-                </MessageList>
+
+                    <MessageList>
+                      <MessageSeparator>
+                        Sunday, 15 Jan 2023
+                      </MessageSeparator>
+                    {messages.map(makeMessage)}
+                    </MessageList>
                 <MessageInput placeholder="Type message here" onSend={(msg:string) => {
                   sendMessage(msg, chatId)
                   .then(res => res.json())
