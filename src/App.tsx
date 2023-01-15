@@ -68,9 +68,9 @@ async function getIncomingBus(bsCode: string) {
   return response.text();
 }
 
-function ble() {
-  const device = navigator.bluetooth.requestDevice({acceptAllDevices: true}).then(res => console.log(res));
-}
+// function ble() {
+//   const device = navigator.bluetooth.getDevices().then(res => console.log(res));
+// }
 
 function App() {
   // useEffect(() => {
@@ -92,7 +92,7 @@ function App() {
   const [incomingBuses, setIncoming] = useState(["10", "69"]);
   const [hasBus, sethasBus] = useState("");
   const [busBtns, setBusBtns] = useState<ReactElement[]>([]);
-
+  const [chatId, setChatId] = useState<string>("");
 
   const [speed, setSpeed] = useState(0);
   // const [firstAlt, setFirstAlt] = useState(0);
@@ -166,11 +166,20 @@ function App() {
     }
   }, [lastMessage, setMessageHistory])
 
-  // const getChatIdClick = (busNum:string) => (e:React.MouseEvent) => {
-  //   e.preventDefault();
-  //   navigator.bluetooth.
-  //   fetch()
-  // }
+  const getChatIdClick = (busNum:string) => (e:React.MouseEvent) => {
+    e.preventDefault();
+    // ble();
+    fetch("https://fj7e6zvssaevc7btyjokyfsrrq0yypos.lambda-url.ap-northeast-1.on.aws/", 
+    {
+      method: "POST",
+      body: JSON.stringify({
+        busNumber: busNum,
+      }),
+    }).then(res => res.json())
+    .then(data => setChatId(data.chatId));
+    // fetch()
+  }
+
   return (
     <div className="App">
       {header}
@@ -178,9 +187,6 @@ function App() {
       <Container fluid className="p-4">
         <Row>
           <Col sm={6}>
-            <Button onClick={ble}>
-
-            </Button>
             {section(
               "My location",
               <div>
@@ -208,7 +214,7 @@ function App() {
                     const busBtns = buses.map(x => {
                       return (
                         <>
-                        <Button variant="light" key={x}>{x}</Button>
+                        <Button onClick={getChatIdClick(x)} variant="light" key={x}>{x}</Button>
                         </>
                       )
                     });
