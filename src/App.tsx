@@ -200,18 +200,9 @@ function App() {
             {section(
               "Are you boarding?",
               <div>
-                <InputGroup size="lg" className="mb-3">
-                  <InputGroup.Text id="basic-addon1">@</InputGroup.Text>
-                  <Form.Control
-                    placeholder="I am called..."
-                    aria-label="Username"
-                    aria-describedby="basic-addon1"
-                  />
-                </InputGroup>
-                <InputGroup>
-                  <InputGroup.Text>How are you</InputGroup.Text>
-                  <Form.Control as="textarea" aria-label="With textarea" />
-                </InputGroup>
+                {incomingBus}
+                <Button>Yes</Button>
+                <Button>No</Button>
               </div>
             )}
           </Col>
