@@ -11,7 +11,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import ListGroup from "react-bootstrap/ListGroup";
 import Row from "react-bootstrap/Row";
 
-import React from "react";
+import React, { ReactElement } from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 import mapboxgl, { LngLat, MercatorCoordinate } from "mapbox-gl";
@@ -20,6 +20,7 @@ import { Button } from "react-bootstrap";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, ConversationHeader, Avatar, MessageSeparator} from '@chatscope/chat-ui-kit-react';
+import { JsxElement } from "typescript";
 
 // var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
 
@@ -88,8 +89,9 @@ function App() {
   const [firstTime, setFirstTime] = useState(0);
   const [nearestBusStop, setNearest] = useState("");
   const [nearestDes, setNearestDes] = useState("");
-  const [incomingBuses, setIncoming] = useState([]);
+  const [incomingBuses, setIncoming] = useState(["10", "69"]);
   const [hasBus, sethasBus] = useState("");
+  const [busBtns, setBusBtns] = useState<ReactElement[]>([]);
 
 
   const [speed, setSpeed] = useState(0);
@@ -164,29 +166,11 @@ function App() {
     }
   }, [lastMessage, setMessageHistory])
 
-  // const handleClickChangeSocketUrl = useCallback(
-  //   () => setSocketUrl('wss://nxbcjwnvqc.execute-api.ap-northeast-1.amazonaws.com/Prod'),
-  //   []
-  // );
-
-  // const handleClickSendMessage = useCallback(() => sendMessage('{"action":"sendmessage", "data":"hello world"}'), []);
-
-  // const connectionStatus = {
-  //   [ReadyState.CONNECTING]: 'Connecting',
-  //   [ReadyState.OPEN]: 'Open',
-  //   [ReadyState.CLOSING]: 'Closing',
-  //   [ReadyState.CLOSED]: 'Closed',
-  //   [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
-  // }[readyState];
-
-  function makeButton(busNum) {
-    return (
-      <Button onClick={(e) => sethasBus(busNum)}>
-        busNum
-      </Button>
-    );
-  }
-
+  // const getChatIdClick = (busNum:string) => (e:React.MouseEvent) => {
+  //   e.preventDefault();
+  //   navigator.bluetooth.
+  //   fetch()
+  // }
   return (
     <div className="App">
       {header}
@@ -208,11 +192,37 @@ function App() {
             )}
             <br></br>
             {section(
-              "Are you boarding?",
+              "Boarding now?",
               <div>
-                {incomingBuses}
-                <Button>Yes</Button>
-                <Button>No</Button>
+                {/* {incomingBuses} */}
+                {
+                  busBtns.length == 0 ?
+                <Button onClick={e => {
+                  e.preventDefault(); 
+                  getIncomingBus(nearestBusStop)
+                  .then(buses => {
+                    setIncoming([...incomingBuses, ...JSON.parse(buses)]);
+                    return incomingBuses;
+                  })
+                  .then((buses:string[]) => {
+                    const busBtns = buses.map(x => {
+                      return (
+                        <>
+                        <Button variant="light" key={x}>{x}</Button>
+                        </>
+                      )
+                    });
+                    setBusBtns(busBtns);
+                   return (
+                    <div>
+                      {busBtns}
+                    </div>
+                   )
+                  })
+                }}>Boarding</Button>
+                :
+                busBtns
+              }
               </div>
             )}
           </Col>
