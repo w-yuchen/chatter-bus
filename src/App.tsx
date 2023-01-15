@@ -88,7 +88,9 @@ function App() {
   const [firstTime, setFirstTime] = useState(0);
   const [nearestBusStop, setNearest] = useState("");
   const [nearestDes, setNearestDes] = useState("");
-  const [incomingBus, setIncoming] = useState([]);
+  const [incomingBuses, setIncoming] = useState([]);
+  const [hasBus, sethasBus] = useState("");
+
 
   const [speed, setSpeed] = useState(0);
   // const [firstAlt, setFirstAlt] = useState(0);
@@ -177,6 +179,14 @@ function App() {
     [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
   }[readyState];
 
+  function makeButton(busNum) {
+    return (
+      <Button onClick={(e) => sethasBus(busNum)}>
+        busNum
+      </Button>
+    );
+  }
+
   return (
     <div className="App">
       {header}
@@ -200,7 +210,7 @@ function App() {
             {section(
               "Are you boarding?",
               <div>
-                {incomingBus}
+                {incomingBuses}
                 <Button>Yes</Button>
                 <Button>No</Button>
               </div>
