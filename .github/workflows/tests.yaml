@@ -1,0 +1,42 @@
+name: CI for Cmake Project - MacOS
+
+on:
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  build-mac:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.6.0
+      - run: npm install
+      - run: npm ci
+      - run: CI=false npm run build
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: build
+          path: build/*
+
+  unit-test-mac:
+    needs: build-mac
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v2.1.1
+        with:
+          name: build
+          path: build/
+
+      - name: show struct
+        shell: bash
+        run: ls -R
+
