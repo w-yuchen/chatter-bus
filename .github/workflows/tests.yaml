@@ -34,6 +34,7 @@ jobs:
         uses: actions/download-artifact@v2.1.1
         with:
           name: build
+          path: build/
 
       - name: show struct
         shell: bash
